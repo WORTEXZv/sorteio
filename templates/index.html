@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Presença</title>
+    <style>
+        /* CSS para o visual */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            color: white;
+            display: flex;
+            justify-content: center;
+            padding-top: 50px;
+        }
+        .container {
+            background: #333842;
+            padding: 30px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.5);
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+        }
+        button {
+            width: 95%;
+            padding: 10px;
+            background-color: #61dafb;
+            color: #282c34;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover { background-color: #4fa8c7; }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        li {
+            background: #444c56;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Deixe seu Nome Registrado</h2>
+        
+        <input type="text" id="inputNome" placeholder="Digite seu nome aqui...">
+        <button onclick="adicionarNome()">Gravar Nome</button>
+        
+        <ul id="listaNomes"></ul>
+    </div>
+
+    <script>
+        // JavaScript para conectar o site ao Python
+        window.onload = carregarNomes;
+
+        async function carregarNomes() {
+            const resposta = await fetch('/api/nomes');
+            const nomes = await resposta.json();
+            const lista = document.getElementById('listaNomes');
+            lista.innerHTML = ''; 
+            
+            nomes.reverse().forEach(nome => {
+                const li = document.createElement('li');
+                li.textContent = nome;
+                lista.appendChild(li);
+            });
+        }
+
+        async function adicionarNome() {
+            const input = document.getElementById('inputNome');
+            const nome = input.value;
+            
+            if (nome.trim() !== '') {
+                await fetch('/api/nomes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ nome: nome })
+                });
+                input.value = ''; 
+                carregarNomes();  
+            }
+        }
+    </script>
+</body>
+</html>
